@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-class MediaControllersWebTest {
+class MediaControllerWebTest {
 
     private static final String MEDIA_ENDPOINT = "/v1/media";
 
