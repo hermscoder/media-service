@@ -20,25 +20,20 @@ public class MediaController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Media> findAllToBeDeleted(@PathVariable Long id) {
+    public ResponseEntity<Media> getMedia(@PathVariable Long id) {
         Media mediaById = mediaService.findMediaById(id);
 
         return mediaById == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(mediaService.findMediaById(id));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<List<Media>> createMedia(@RequestPart("file") MultipartFile[] files) {
+    public ResponseEntity<List<Media>> createMedia(@RequestPart("files") MultipartFile[] files) {
         return ResponseEntity.ok(mediaService.createMedias(files));
     }
 
-    @DeleteMapping()
+    @DeleteMapping
     public ResponseEntity<Void> setMediaToBeDeleted(@RequestParam("ids") Long... mediaIds) {
         mediaService.setMediaToBeDeleted(mediaIds);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("toBeDeleted")
-    public ResponseEntity<List<Media>> findAllToBeDeleted() {
-        return ResponseEntity.ok(mediaService.findMediasToBeDeleted());
     }
 }
