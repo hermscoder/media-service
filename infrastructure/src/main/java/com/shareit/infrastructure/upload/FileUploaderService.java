@@ -33,7 +33,7 @@ public class FileUploaderService implements UploaderService {
     public List<UploadedMedia> uploadParallel(MultipartFile[] multipartFiles, Map options) throws FailedUploadException {
         UploadResult uploadResult = new UploadResult();
 
-        if(multipartFiles == null || multipartFiles.length == 0 || multipartFiles[0].getSize() == 0) {
+        if(multipartFiles == null || multipartFiles.length == 0 || (multipartFiles.length == 1 && multipartFiles[0].getSize() == 0)) {
             throw new BadRequestException("Unable to upload. No files were provided.");
         }
 
