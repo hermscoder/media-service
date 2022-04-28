@@ -102,4 +102,12 @@ class MediaServiceTest {
         assertEquals("Upload failed", failedUploadException.getMessage());
         assertEquals(expectedUploadErrorList.get(0), failedUploadException.getUploadErrors().get(0));
     }
+
+    @Test
+    public void testSetMediaToBeDeleted() {
+        when(mediaRepository.setMediaToBeDeleted(anyLong(), anyLong())).thenReturn(2);
+
+        int rowsAffected = mediaService.setMediaToBeDeleted(1L, 2L);
+        assertTrue(rowsAffected == 2);
+    }
 }
