@@ -2,7 +2,6 @@ package com.shareit.infrastructure.upload;
 
 import com.shareit.infrastructure.upload.exception.FailedDestructionException;
 import com.shareit.infrastructure.upload.exception.FailedUploadException;
-import com.shareit.utils.commons.exception.BadRequestException;
 import com.shareit.utils.commons.exception.InvalidParameterException;
 import org.springframework.web.multipart.MultipartFile;
 
