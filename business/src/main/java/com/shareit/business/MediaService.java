@@ -6,7 +6,7 @@ import com.shareit.domain.entity.MediaEntity;
 import com.shareit.domain.mapper.MediaMapper;
 import com.shareit.infrastructure.upload.UploadedMedia;
 import com.shareit.infrastructure.upload.UploaderService;
-import com.shareit.utils.commons.exception.BadRequestException;
+import com.shareit.utils.commons.exception.InvalidParameterException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +28,7 @@ public class MediaService {
         List<Media> mediaList = new ArrayList<>();
 
         if(multipartFiles == null || multipartFiles.length == 0) {
-            throw new BadRequestException("Unable to upload. No files were provided.");
+            throw new InvalidParameterException("files", "Unable to upload. No files were provided.");
         }
 
         List<UploadedMedia> uploadedMediaList = uploaderService.uploadParallel(multipartFiles, Collections.emptyMap());
