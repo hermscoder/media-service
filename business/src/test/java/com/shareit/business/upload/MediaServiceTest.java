@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -109,5 +110,35 @@ class MediaServiceTest {
 
         int rowsAffected = mediaService.setMediaToBeDeleted(1L, 2L);
         assertTrue(rowsAffected == 2);
+    }
+
+    @Test
+    public void testFindMediasToBeDeleted() {
+        when(mediaRepository.findAllToBeDeleted()).thenReturn(Optional.of(mediaEntityList));
+
+        List<Media> mediasToBeDeleted = mediaService.findMediasToBeDeleted();
+
+        assertNotNull(mediasToBeDeleted);
+        assertFalse(mediasToBeDeleted.isEmpty());
+        assertEquals(expectedMedia, mediasToBeDeleted.get(0));
+    }
+
+    @Test
+    public void testFindMediaById() {
+        when(mediaRepository.findById(anyLong())).thenReturn(Optional.of(mediaEntityList.get(0)));
+
+        Media mediaById = mediaService.findMediaById(1L);
+
+        assertNotNull(mediaById);
+        assertEquals(expectedMedia, mediaById);
+    }
+
+    @Test
+    public void testFindMediaByIdNotFound() {
+        when(mediaRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        Media mediaById = mediaService.findMediaById(1L);
+
+        assertNull(mediaById);
     }
 }
