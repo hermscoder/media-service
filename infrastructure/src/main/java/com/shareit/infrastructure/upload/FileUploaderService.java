@@ -46,7 +46,7 @@ public class FileUploaderService implements UploaderService {
                     throw new InvalidParameterException(String.format("files", "Unable to upload. File (%s) size too large. More than %.0f Mbs", multipartFile.getOriginalFilename(), cloudinaryManager.getCloudinarySettings().getMaxFileSize()/1000000.0));
                 }
 
-                Map upload = cloudinaryManager.upload(multipartFile.getBytes(), options);
+                Map upload = upload(multipartFile, options);
                 uploadResult.addUploadedMedia(
                         multipartFile.getOriginalFilename(),
                         upload.getOrDefault("url", "").toString(),
