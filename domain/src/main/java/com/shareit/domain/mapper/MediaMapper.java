@@ -12,21 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+//TODO unit tests
 @Mapper
-@Component
 public interface MediaMapper {
     MediaMapper INSTANCE = Mappers.getMapper(MediaMapper.class);
 
     default List<MediaEntity> toEntityList(List<UploadedMedia> uploadedMediaList) {
         return uploadedMediaList.stream().map(this::toEntity).collect(Collectors.toList());
-    }
-
-    default MediaEntity toEntity(Map map) {
-        return new MediaEntity(
-                null ,
-                MediaType.IMAGE,
-                map.getOrDefault("url", "").toString(),
-                map.getOrDefault("public_id", "").toString());
     }
 
     default MediaEntity toEntity(UploadedMedia uploadedMedia) {

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+//TODO unit tests
 @Service
 public class FileUploaderService implements UploaderService {
 
