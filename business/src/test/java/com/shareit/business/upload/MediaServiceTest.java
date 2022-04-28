@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-//TODO unit tests
 class MediaServiceTest {
     private final UploaderService uploaderService;
     private final MediaService mediaService;
