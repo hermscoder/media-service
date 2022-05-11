@@ -25,4 +25,10 @@ public interface MediaRepository extends JpaRepository<MediaEntity, Long> {
 
     @Query("SELECT m FROM MediaEntity m WHERE m.pendingDeletion = true")
     Optional<List<MediaEntity>> findAllToBeDeleted();
+
+    @Transactional
+    @Modifying
+    @Query("UPDATE MediaEntity m " +
+            "SET m.publicId = ?2, m.url = ?3  WHERE m.id in ?1")
+    int updateMediaUploadInformation(Long id, String publicId, String url);
 }
