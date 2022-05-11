@@ -4,6 +4,7 @@ import com.shareit.data.repository.MediaRepository;
 import com.shareit.domain.dto.Media;
 import com.shareit.domain.entity.MediaEntity;
 import com.shareit.domain.mapper.MediaMapper;
+import com.shareit.exception.MediaNotFoundException;
 import com.shareit.infrastructure.upload.UploadedMedia;
 import com.shareit.infrastructure.upload.UploaderService;
 import com.shareit.utils.commons.exception.InvalidParameterException;
@@ -35,7 +36,7 @@ public class MediaService {
 
 
         List<MediaEntity> mediaEntityList = MediaMapper.INSTANCE.toEntityList(uploadedMediaList);
-        mediaList.addAll(MediaMapper.INSTANCE.toModeList(mediaRepository.saveAll(mediaEntityList)));
+        mediaList.addAll(MediaMapper.INSTANCE.toModelList(mediaRepository.saveAll(mediaEntityList)));
 
         return mediaList;
     }
@@ -63,5 +64,24 @@ public class MediaService {
             return null;
 
         return MediaMapper.INSTANCE.toModel(mediaOptional.get());
+    }
+
+    //TODO write test for this method
+    public Media updateMedia(Long mediaId, MultipartFile file) {
+
+        Optional<MediaEntity> existingMediaOptional = mediaRepository.findById(mediaId);
+
+        if(existingMediaOptional.isEmpty()) {
+            throw new MediaNotFoundException(String.format("Media %s could notbe found", mediaId));
+        }
+        MediaEntity existingMedia = existingMediaOptional.get();
+
+        UploadedMedia uploadedMedia = uploaderService.upload(file, Collections.emptyMap());
+        mediaRepository.updateMediaUploadInformation(mediaId, uploadedMedia.getPublicId(), uploadedMedia.getUrl());
+        Media media = MediaMapper.INSTANCE.toModel(existingMedia);
+        media.setUrl(uploadedMedia.getUrl());
+
+        uploaderService.destroyUploadedMedias(Arrays.asList(existingMedia.getPublicId()));
+        return media;
     }
 }
