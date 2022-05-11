@@ -31,6 +31,11 @@ public class MediaController {
         return ResponseEntity.ok(mediaService.createMedias(files));
     }
 
+    @PutMapping(value = "{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Media> updateMedia(@PathVariable Long id, @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok(mediaService.updateMedia(id, file));
+    }
+
     @DeleteMapping
     public ResponseEntity<Void> setMediaToBeDeleted(@RequestParam("ids") Long... mediaIds) {
         mediaService.setMediaToBeDeleted(mediaIds);
