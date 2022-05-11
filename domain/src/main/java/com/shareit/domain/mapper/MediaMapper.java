@@ -25,7 +25,7 @@ public interface MediaMapper {
     @Mapping(target = "pendingDeletion", constant = "false")
     MediaEntity toEntity(UploadedMedia uploadedMedia);
 
-    default List<Media> toModeList(List<MediaEntity> mediaEntity) {
+    default List<Media> toModelList(List<MediaEntity> mediaEntity) {
         return mediaEntity.stream().map(this::toModel).collect(Collectors.toList());
     }
 
