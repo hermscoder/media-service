@@ -18,8 +18,8 @@ public class UploadResult {
         this.uploadedMedias = uploadedMedias;
     }
 
-    public void addUploadedMedia(String fileName, String url, String public_id) {
-        uploadedMedias.add(new UploadedMedia(fileName, url, public_id));
+    public void addUploadedMedia(UploadedMedia uploadedMedia) {
+        uploadedMedias.add(uploadedMedia);
     }
 
     public void addUploadError(String fileName, String errorMsg) {
