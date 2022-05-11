@@ -32,6 +32,8 @@ class FileUploaderServiceTest {
                                         "url", url,
                                         "public_id", publicId);
 
+    private final UploadedMedia expectedUploadMedia = new UploadedMedia(fileName, url, publicId);
+
     private final List<UploadedMedia> expectedUploadedMediaList = Arrays.asList(new UploadedMedia(fileName, url, publicId));
 
     private CloudinarySettings cloudinarySettings;
@@ -52,11 +54,10 @@ class FileUploaderServiceTest {
     void testUpload() throws IOException {
         when(cloudinaryManager.upload(any(), anyMap())).thenReturn(expectedUploadReturnMap);
 
-        Map uploadReturn = fileUploaderService.upload(new MockMultipartFile(fileName, new byte[10]), Collections.emptyMap());
+        UploadedMedia uploadedMedia = fileUploaderService.upload(new MockMultipartFile(fileName, new byte[10]), Collections.emptyMap());
 
-        assertNotNull(uploadReturn);
-        assertFalse(uploadReturn.isEmpty());
-        assertEquals(expectedUploadReturnMap, uploadReturn);
+        assertNotNull(uploadedMedia);
+        assertEquals(expectedUploadMedia, uploadedMedia);
     }
 
     @Test

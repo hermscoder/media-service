@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 //TODO unit tests
 @Service
@@ -22,9 +23,13 @@ public class FileUploaderService implements UploaderService {
         this.cloudinaryManager = cloudinaryManager;
     }
 
-    public Map upload(MultipartFile multipartFile, Map options) throws FailedUploadException {
+    public UploadedMedia upload(MultipartFile multipartFile, Map options) throws FailedUploadException {
         try {
-            return cloudinaryManager.upload(multipartFile.getBytes(), options);
+            Map uploadResponse = cloudinaryManager.upload(multipartFile.getBytes(), options);
+            return new UploadedMedia(
+                    multipartFile.getOriginalFilename(),
+                    uploadResponse.getOrDefault("url", "").toString(),
+                    uploadResponse.getOrDefault("public_id", "").toString());
         } catch (IOException e) {
             throw new FailedUploadException(e.getMessage());
         }
@@ -46,18 +51,14 @@ public class FileUploaderService implements UploaderService {
                     throw new InvalidParameterException(String.format("files", "Unable to upload. File (%s) size too large. More than %.0f Mbs", multipartFile.getOriginalFilename(), cloudinaryManager.getCloudinarySettings().getMaxFileSize()/1000000.0));
                 }
 
-                Map upload = upload(multipartFile, options);
-                uploadResult.addUploadedMedia(
-                        multipartFile.getOriginalFilename(),
-                        upload.getOrDefault("url", "").toString(),
-                        upload.getOrDefault("public_id", "").toString());
+                uploadResult.addUploadedMedia(upload(multipartFile, options));
             } catch (Exception e) {
                 uploadResult.addUploadError(multipartFile.getOriginalFilename(), e.getMessage());
             }
         });
 
         if(uploadResult.hasErrors()) {
-            destroyUploadedMedias(uploadResult.getUploadedMedias());
+            destroyUploadedMedias(uploadResult.getUploadedMedias().stream().map(UploadedMedia::getPublicId).collect(Collectors.toList()));
             throw new FailedUploadException("Upload failed", uploadResult.getUploadErrors());
         }
 
@@ -65,8 +66,8 @@ public class FileUploaderService implements UploaderService {
     }
 
     @Async
-    CompletableFuture<Void> destroyUploadedMedias(List<UploadedMedia> uploadedMedias) {
-        return CompletableFuture.runAsync(() -> uploadedMedias.forEach(uploadedMedia -> destroy(uploadedMedia.getPublicId(), Collections.emptyMap())));
+    public CompletableFuture<Void> destroyUploadedMedias(List<String> publicIds) {
+        return CompletableFuture.runAsync(() -> publicIds.forEach(publicId -> destroy(publicId, Collections.emptyMap())));
     }
 
     public Map destroy(String publicId, Map options) throws FailedDestructionException {
