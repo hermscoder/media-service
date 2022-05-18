@@ -5,6 +5,7 @@ import com.shareit.data.repository.MediaRepository;
 import com.shareit.domain.dto.Media;
 import com.shareit.domain.entity.MediaEntity;
 import com.shareit.domain.entity.MediaType;
+import com.shareit.exception.MediaNotFoundException;
 import com.shareit.infrastructure.upload.UploadError;
 import com.shareit.infrastructure.upload.UploadedMedia;
 import com.shareit.infrastructure.upload.UploaderService;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -140,4 +142,37 @@ class MediaServiceTest {
 
         assertNull(mediaById);
     }
+
+    @Test
+    public void testUpdateMediaThrowsMediaNotFoundException() {
+        when(mediaRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        MediaNotFoundException mediaNotFoundException = assertThrows(MediaNotFoundException.class, () -> mediaService.updateMedia(1L, newMockMultipartFile(fileName)));
+        assertNotNull(mediaNotFoundException);
+        assertEquals(mediaNotFoundException.getMessage(), "Media 1 could not be found");
+    }
+
+    @Test
+    public void testUpdateMedia() {
+        UploadedMedia uploadedMedia = new UploadedMedia(fileName, url, publicId);
+        when(mediaRepository.findById(anyLong())).thenReturn(Optional.of(mediaEntityList.get(0)));
+        when(uploaderService.upload(any(MultipartFile.class), anyMap())).thenReturn(uploadedMedia);
+        when(mediaRepository.updateMediaUploadInformation(anyLong(), anyString(), anyString())).thenReturn(1);
+        when(uploaderService.destroyUploadedMedias(anyList())).thenReturn(Mockito.mock(CompletableFuture.class));
+
+        Media updatedMedia = mediaService.updateMedia(1L, newMockMultipartFile(fileName));
+
+        assertNotNull(updatedMedia);
+        assertEquals(expectedMedia, updatedMedia);
+    }
+
+    private static MockMultipartFile newMockMultipartFile(String fileName) {
+        return newMockMultipartFile(fileName, 10);
+    }
+
+    private static MockMultipartFile newMockMultipartFile(String fileName, int contentSize) {
+        byte[] content = new byte[contentSize];
+        return new MockMultipartFile(fileName, fileName, "multipart/form-data", content);
+    }
+
 }
