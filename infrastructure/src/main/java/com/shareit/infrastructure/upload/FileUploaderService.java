@@ -39,17 +39,15 @@ public class FileUploaderService implements UploaderService {
     public List<UploadedMedia> uploadParallel(MultipartFile[] multipartFiles, Map options) throws FailedUploadException {
         UploadResult uploadResult = new UploadResult();
 
-        if(multipartFiles == null || multipartFiles.length == 0 || (multipartFiles.length == 1 && multipartFiles[0].getSize() == 0)) {
+        if(multipartFiles == null || multipartFiles.length == 0){
             throw new InvalidParameterException("files", "Unable to upload. No files were provided.");
+        } else if(multipartFiles.length == 1) {
+            validateSingleMultipartFile(multipartFiles[0]);
         }
 
         Arrays.asList(multipartFiles).parallelStream().forEach(multipartFile -> {
             try {
-                if (multipartFile.isEmpty()) {
-                    throw new InvalidParameterException(String.format("files", "Unable to upload. An empty file (%s) was provided.", multipartFile.getOriginalFilename()));
-                } else if (multipartFile.getSize() > cloudinaryManager.getCloudinarySettings().getMaxFileSize()) {
-                    throw new InvalidParameterException(String.format("files", "Unable to upload. File (%s) size too large. More than %.0f Mbs", multipartFile.getOriginalFilename(), cloudinaryManager.getCloudinarySettings().getMaxFileSize()/1000000.0));
-                }
+                validateSingleMultipartFile(multipartFile);
 
                 uploadResult.addUploadedMedia(upload(multipartFile, options));
             } catch (Exception e) {
@@ -65,11 +63,22 @@ public class FileUploaderService implements UploaderService {
         return uploadResult.getUploadedMedias();
     }
 
-    @Async
-    public CompletableFuture<Void> destroyUploadedMedias(List<String> publicIds) {
-        return CompletableFuture.runAsync(() -> publicIds.forEach(publicId -> destroy(publicId, Collections.emptyMap())));
+    private void validateSingleMultipartFile(MultipartFile multipartFile){
+        if (multipartFile.isEmpty()) {
+            throw new InvalidParameterException("files", String.format("Unable to upload. An empty file (%s) was provided.", multipartFile.getOriginalFilename()));
+        } else if (multipartFile.getSize() > cloudinaryManager.getCloudinarySettings().getMaxFileSize()) {
+            throw new InvalidParameterException("files", String.format("Unable to upload. File (%s) size too large. More than %.0f Mbs", multipartFile.getOriginalFilename(), cloudinaryManager.getCloudinarySettings().getMaxFileSize()/1000000.0));
+        }
     }
 
+    @Async
+    public CompletableFuture<Void> destroyUploadedMedias(List<String> publicIds) {
+        return CompletableFuture.runAsync(() -> publicIds.forEach(publicId -> destroy(publicId)));
+    }
+
+    public Map destroy(String publicId) throws FailedDestructionException {
+        return destroy(publicId, Collections.emptyMap());
+    }
     public Map destroy(String publicId, Map options) throws FailedDestructionException {
         try {
             return cloudinaryManager.destroy(publicId, options);
