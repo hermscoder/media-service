@@ -66,13 +66,12 @@ public class MediaService {
         return MediaMapper.INSTANCE.toModel(mediaOptional.get());
     }
 
-    //TODO write test for this method
     public Media updateMedia(Long mediaId, MultipartFile file) {
 
         Optional<MediaEntity> existingMediaOptional = mediaRepository.findById(mediaId);
 
         if(existingMediaOptional.isEmpty()) {
-            throw new MediaNotFoundException(String.format("Media %s could notbe found", mediaId));
+            throw new MediaNotFoundException(String.format("Media %s could not be found", mediaId));
         }
         MediaEntity existingMedia = existingMediaOptional.get();
 
