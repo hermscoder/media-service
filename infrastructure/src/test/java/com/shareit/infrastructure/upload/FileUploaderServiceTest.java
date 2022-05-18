@@ -115,7 +115,7 @@ class FileUploaderServiceTest {
     void testUploadParallelWithSingleEmptyFile() {
         when(cloudinaryManager.getCloudinarySettings()).thenReturn(cloudinarySettings);
 
-        MultipartFile[] multipartFiles = new MultipartFile[] { MockMultipartFileObjectMother.newMockMultipartFile(fileName, 0) };
+        MultipartFile[] multipartFiles = new MultipartFile[] { newMockMultipartFile(fileName, 0) };
         InvalidParameterException invalidParameterException = assertThrows(InvalidParameterException.class, () -> fileUploaderService.uploadParallel(multipartFiles, Collections.emptyMap()));
 
         assertNotNull(invalidParameterException);
@@ -127,7 +127,7 @@ class FileUploaderServiceTest {
     void testUploadParallelWithSingleMaxSizeFile() {
         when(cloudinaryManager.getCloudinarySettings()).thenReturn(cloudinarySettings);
 
-        MultipartFile[] multipartFiles = new MultipartFile[] { MockMultipartFileObjectMother.newMockMultipartFile(fileName, 10485761) };
+        MultipartFile[] multipartFiles = new MultipartFile[] { newMockMultipartFile(fileName, 10485761) };
         InvalidParameterException invalidParameterException = assertThrows(InvalidParameterException.class, () -> fileUploaderService.uploadParallel(multipartFiles, Collections.emptyMap()));
 
         assertNotNull(invalidParameterException);
@@ -140,8 +140,8 @@ class FileUploaderServiceTest {
         when(cloudinaryManager.getCloudinarySettings()).thenReturn(cloudinarySettings);
 
         MultipartFile[] multipartFiles = new MultipartFile[] {
-                MockMultipartFileObjectMother.newMockMultipartFile("empty_file.png", 0),
-                MockMultipartFileObjectMother.newMockMultipartFile("max_size_file.png", 10485761) };
+                newMockMultipartFile("empty_file.png", 0),
+                newMockMultipartFile("max_size_file.png", 10485761) };
         FailedUploadException failedUploadException = assertThrows(FailedUploadException.class, () -> fileUploaderService.uploadParallel(multipartFiles, Collections.emptyMap()));
 
         assertNotNull(failedUploadException);
@@ -159,8 +159,8 @@ class FileUploaderServiceTest {
         when(cloudinaryManager.upload(any(), anyMap())).thenReturn(expectedUploadReturnMap);
 
         MultipartFile[] multipartFiles = new MultipartFile[] {
-                MockMultipartFileObjectMother.newMockMultipartFile(fileName),
-                MockMultipartFileObjectMother.newMockMultipartFile("max_size_file.png", 10485761) };
+                newMockMultipartFile(fileName),
+                newMockMultipartFile("max_size_file.png", 10485761) };
         FailedUploadException failedUploadException = assertThrows(FailedUploadException.class, () -> fileUploaderService.uploadParallel(multipartFiles, Collections.emptyMap()));
 
         assertNotNull(failedUploadException);
@@ -203,5 +203,14 @@ class FileUploaderServiceTest {
         assertEquals(failedDestructionException.getMessage(), "Unable to destroy file");
     }
 
+
+    private static MockMultipartFile newMockMultipartFile(String fileName) {
+        return newMockMultipartFile(fileName, 10);
+    }
+
+    private static MockMultipartFile newMockMultipartFile(String fileName, int contentSize) {
+        byte[] content = new byte[contentSize];
+        return new MockMultipartFile(fileName, fileName, "multipart/form-data", content);
+    }
 
 }
