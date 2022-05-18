@@ -13,7 +13,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-//TODO unit tests
 @Service
 public class FileUploaderService implements UploaderService {
 
