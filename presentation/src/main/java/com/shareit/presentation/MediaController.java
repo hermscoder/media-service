@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/v1/media")
+@RequestMapping(path = "/v1/media", produces = MediaType.APPLICATION_JSON_VALUE)
 public class MediaController {
 
     private final MediaService mediaService;
