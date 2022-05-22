@@ -33,7 +33,7 @@
         <hibernate-validator-version>6.2.2.Final</hibernate-validator-version>
         <lombok-version>1.18.20</lombok-version>
         <mapstruct-version>1.4.2.Final</mapstruct-version>
-        <spring-cloud.version>2021.0.3-SNAPSHOT</spring-cloud.version>
+        <spring-cloud.version>2021.0.2</spring-cloud.version>
     </properties>
 
     <dependencyManagement>
